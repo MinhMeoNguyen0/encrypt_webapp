@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -16,7 +16,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Inbox as InboxIcon, Mail as MailIcon } from '@mui/icons-material';
+import LockIcon from '@mui/icons-material/Lock';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -47,6 +49,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -85,9 +88,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const Layout = ({ children }) => {
+export default function MiniDrawer({ children }) {
   const theme = useTheme();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const handleDrawerOpen = () => {
@@ -97,12 +100,6 @@ const Layout = ({ children }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const menuItems = [
-    { text: 'AES', path: '/aes' },
-    { text: 'RSA', path: '/rsa' },
-    { text: 'NTRU', path: '/ntru' },
-  ];
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -121,8 +118,8 @@ const Layout = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            Encryption-Decryption App
+          <Typography variant="h6" noWrap component="div">
+            Encryption/Decryption Tool
           </Typography>
         </Toolbar>
       </AppBar>
@@ -134,7 +131,11 @@ const Layout = ({ children }) => {
         </DrawerHeader>
         <Divider />
         <List>
-          {menuItems.map((item, index) => (
+          {[
+            { text: 'AES Encryption', icon: <LockIcon />, route: '/aes' },
+            { text: 'RSA Encryption', icon: <VpnKeyIcon />, route: '/rsa' },
+            { text: 'NTRU Encryption', icon: <EnhancedEncryptionIcon />, route: '/ntru' },
+          ].map((item, index) => (
             <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
               <ListItemButton
                 sx={{
@@ -142,7 +143,7 @@ const Layout = ({ children }) => {
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                onClick={() => navigate(item.path)}
+                onClick={() => navigate(item.route)}
               >
                 <ListItemIcon
                   sx={{
@@ -151,13 +152,14 @@ const Layout = ({ children }) => {
                     justifyContent: 'center',
                   }}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {item.icon}
                 </ListItemIcon>
                 <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
+        <Divider />
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
@@ -165,6 +167,4 @@ const Layout = ({ children }) => {
       </Box>
     </Box>
   );
-};
-
-export default Layout;
+}
