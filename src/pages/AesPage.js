@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Slider, AppBar, Toolbar, CssBaseline, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Layout from '../components/Layout';
+
+const Container = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  padding: theme.spacing(3),
+  height: '100vh',
+}));
+
+const Section = styled(Box)(({ theme }) => ({
+  flex: 1,
+  padding: theme.spacing(2),
+}));
 
 const AesPage = () => {
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
   const [strength, setStrength] = useState(50);
+  const [mode, setMode] = useState('encrypt');
 
   const handleEncrypt = () => {
     setResult(`Encrypted AES Text with strength ${strength}`);
@@ -17,7 +31,7 @@ const AesPage = () => {
   };
 
   const handleModeChange = (event) => {
-    // Handle mode change (standard, fluency, etc.)
+    setMode(event.target.value);
   };
 
   return (
@@ -31,19 +45,12 @@ const AesPage = () => {
               <Select
                 labelId="mode-select-label"
                 id="mode-select"
+                value={mode}
                 onChange={handleModeChange}
                 label="Modes"
               >
-                <MenuItem value="standard">Standard</MenuItem>
-                <MenuItem value="fluency">Fluency</MenuItem>
-                <MenuItem value="natural">Natural</MenuItem>
-                <MenuItem value="formal">Formal</MenuItem>
-                <MenuItem value="academic">Academic</MenuItem>
-                <MenuItem value="simple">Simple</MenuItem>
-                <MenuItem value="creative">Creative</MenuItem>
-                <MenuItem value="expand">Expand</MenuItem>
-                <MenuItem value="shorten">Shorten</MenuItem>
-                <MenuItem value="custom">Custom</MenuItem>
+                <MenuItem value="encrypt">Encrypt</MenuItem>
+                <MenuItem value="decrypt">Decrypt</MenuItem>
               </Select>
             </FormControl>
             <Box sx={{ flexGrow: 1 }} />
@@ -55,52 +62,59 @@ const AesPage = () => {
           </Toolbar>
         </AppBar>
         <Toolbar />
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h3" gutterBottom>AES Encryption</Typography>
-          <Box sx={{ mb: 4 }}>
+        <Container>
+          <Section>
             <Typography variant="h6" gutterBottom>
-              Strength of Encryption
+              Enter text to {mode}
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={10}
+              variant="outlined"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={`Enter text to ${mode}`}
+            />
+            <Box sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={mode === 'encrypt' ? handleEncrypt : handleDecrypt}
+              >
+                {mode === 'encrypt' ? 'Encrypt' : 'Decrypt'}
+              </Button>
+            </Box>
+          </Section>
+          <Section sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography variant="h6" gutterBottom>
+              Strength of {mode === 'encrypt' ? 'Encryption' : 'Decryption'}
             </Typography>
             <Slider
               value={strength}
               onChange={(e, newValue) => setStrength(newValue)}
               aria-labelledby="encryption-strength-slider"
               valueLabelDisplay="auto"
+              sx={{ width: '80%' }}
             />
-          </Box>
-          <Box sx={{ mb: 4 }}>
+          </Section>
+          <Section>
+            <Typography variant="h6" gutterBottom>
+              Result
+            </Typography>
             <TextField
               fullWidth
               multiline
-              rows={6}
+              rows={10}
               variant="outlined"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Enter text to encrypt"
+              value={result}
+              placeholder="Result will be shown here"
+              InputProps={{
+                readOnly: true,
+              }}
             />
-          </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleEncrypt}
-          >
-            Encrypt
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleDecrypt}
-            sx={{ ml: 2 }}
-          >
-            Decrypt
-          </Button>
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h5" gutterBottom>Result:</Typography>
-            <Typography variant="body1" sx={{ p: 2, border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
-              {result}
-            </Typography>
-          </Box>
-        </Box>
+          </Section>
+        </Container>
       </>
     </Layout>
   );
